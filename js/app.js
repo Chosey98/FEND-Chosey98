@@ -25,26 +25,22 @@ function createListItems() {
 function addEventListeners(){
     const listItems = navbar.querySelector('ul').querySelectorAll('li')
     for(const li of listItems){
-        li.addEventListener('click', (e) => {
-            if(e.target.getAttribute('id') == active) return;
-            const activeElement = [...listItems].find(l => l.querySelector('a').getAttribute('id') == active)
-            li.classList.add('active')
-            activeElement.classList.remove('active')
-            active = e.target.getAttribute('id')
+        li.addEventListener('click', async (e) => {
             sections.item(e.target.getAttribute('id')[2] - 1).scrollIntoView({behavior: 'smooth', block: 'center'})
         })
     }
 }
 
-// This function get's the section in view and sets it as active and updates the navbar active status
+// This function get's the section in view and sets it as active
 function setActiveSection() {
+    let activeLink
   for (const section of sections) {
-    const activeLink = document.querySelector(
+     activeLink = document.querySelector(
       `a[id="#${section.getAttribute("id")}"]`
     );
       const bounding = section.getBoundingClientRect();
     if (bounding.top >= 0.4 && bounding.top <= 0.4 * (window.innerHeight || document.documentElement.clientHeight)){
-        active = activeLink.getAttribute("id")
+      active = activeLink.getAttribute("id")
       section.classList.add("active");
       activeLink.parentElement.classList.add("active");
     } else {
@@ -60,9 +56,15 @@ document.addEventListener("DOMContentLoaded", () => {
     addEventListeners()
 })
 
-// This built-in function is used to check the active section in view while scrolling
-setTimeout(
-    window.addEventListener('scroll', () => {
+// This event listener runs when user is scrolling to set active section while hiding the navbar until it is done.
+let timer = null;
+window.addEventListener('scroll', () => {
         setActiveSection()
+        navbar.classList.add("hide");
+        if(timer !== null) {
+            clearTimeout(timer);        
+        }
+        timer = setTimeout(function() {
+              navbar.classList.remove("hide")
+        }, 150);
     })
-    , 2000)
